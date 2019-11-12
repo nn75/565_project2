@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
   }
   infile.close();
 
+  // print 
   for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
       cout << setw(6) <<elevation_array[i][j];
