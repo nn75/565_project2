@@ -17,11 +17,9 @@ int main(int argc, char* argv[]) {
   float A = atof(argv[3]); // absorption rate
   int N = atoi(argv[4]);   // dimension of landscape
   string elevation_file_name = argv[5];
-  vector<vector<int> >  elevation_array;
+  vector<vector<int> >  elevation_array(N, vector<int>(N));
 
-  
   // read elevation file
-  elevation_array.assign(N, vector<int>(N, 0));
   ifstream infile;
   infile.open(elevation_file_name); 
   for (int i = 0; i < N; i++) {
