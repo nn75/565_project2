@@ -1,11 +1,6 @@
-#include <stdio.h>
 #include <fstream>
-#include <iostream>
-#include <vector>
 #include <iomanip>
-
-using namespace std;
-
+#include "RainfallSimulator.h"
 
 int main(int argc, char* argv[]) {
   if(argc != 6) {
@@ -17,14 +12,14 @@ int main(int argc, char* argv[]) {
   float A = atof(argv[3]); // absorption rate
   int N = atoi(argv[4]);   // dimension of landscape
   string elevation_file_name = argv[5];
-  vector<vector<int> >  elevation_array(N, vector<int>(N));
+  vector<vector<int> >  elevation_mat(N, vector<int>(N));
 
   // read elevation file
   ifstream infile;
   infile.open(elevation_file_name); 
   for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			infile >> elevation_array[i][j];
+			infile >> elevation_mat[i][j];
 		}
   }
   infile.close();
@@ -32,10 +27,13 @@ int main(int argc, char* argv[]) {
   // print 
   for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-      cout << setw(6) <<elevation_array[i][j];
+      cout << setw(6) <<elevation_mat[i][j];
 		}
     cout << endl;
   }
+
+  RainfallSimulator simulator;
+  simulator.simulate_seq(elevation_mat, M, A, N);
   
 
   exit(EXIT_SUCCESS);
