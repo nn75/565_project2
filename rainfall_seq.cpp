@@ -32,9 +32,13 @@ int main(int argc, char* argv[]) {
     cout << endl;
   }
 
+  struct timespec start_time, end_time;
+  clock_gettime(CLOCK_MONOTONIC, &start_time);
   RainfallSimulator simulator;
   simulator.simulate_seq(elevation_mat, M, A, N);
+  clock_gettime(CLOCK_MONOTONIC, &end_time);
+  double simulation_time = simulator.calculateTimeInSecond(start_time, end_time);
+  cout << simulation_time << endl;
   
-
   exit(EXIT_SUCCESS);
 }
