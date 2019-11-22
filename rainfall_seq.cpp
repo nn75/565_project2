@@ -35,7 +35,8 @@ int main(int argc, char* argv[]) {
   struct timespec start_time, end_time;
   clock_gettime(CLOCK_MONOTONIC, &start_time);
   RainfallSimulator simulator;
-  simulator.simulate_seq(elevation_mat, M, A, N);
+  simulator.setSimulationParameters(elevation_mat, M, A, N);
+  simulator.simulate_seq();
   clock_gettime(CLOCK_MONOTONIC, &end_time);
   double simulation_time = simulator.calculateTimeInSecond(start_time, end_time);
   cout << simulation_time << endl;

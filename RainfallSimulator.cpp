@@ -2,7 +2,7 @@
 #include "RainfallSimulator.h"
 #define SECUNIT 1000000000.0
 
-void printMat(const vector<vector<double>> &matrix) {
+void printMat(vector<vector<double>> &matrix) {
   int M = matrix.size();
   if (M == 0) {
     cout << "matrix is empty" << endl;
@@ -17,7 +17,7 @@ void printMat(const vector<vector<double>> &matrix) {
     cout << endl;
   }
 }
-void printMatInt(const vector<vector<int>> &matrix) {
+void printMatInt(vector<vector<int>> &matrix) {
   int M = matrix.size();
   if (M == 0) {
     cout << "matrixInt is empty" << endl;
@@ -33,7 +33,7 @@ void printMatInt(const vector<vector<int>> &matrix) {
   }
 }
 
-bool RainfallSimulator::has_lower_neigh(int curRow, int curCol, const vector<vector<int>> &elevation_mat, vector<vector<int>> &lower_neigh_dir) {
+bool RainfallSimulator::has_lower_neigh(int curRow, int curCol, vector<vector<int>> &lower_neigh_dir) {
   int N = elevation_mat.size();
   int min_elevation = elevation_mat[curRow][curCol];
   vector<vector<int>> directions{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -69,7 +69,7 @@ bool RainfallSimulator::has_lower_neigh(int curRow, int curCol, const vector<vec
   return true;
 }
 
-int RainfallSimulator::endAbsorption(vector<vector<double>> &curWater, vector<vector<double>> &res, double A) {
+int RainfallSimulator::endAbsorption(vector<vector<double>> &curWater, vector<vector<double>> &res) {
   int max_time_step = 0;
   int N = curWater.size();
   for (int i = 0; i < N; i++) {
@@ -83,13 +83,13 @@ int RainfallSimulator::endAbsorption(vector<vector<double>> &curWater, vector<ve
   return max_time_step;
 }
 
-bool RainfallSimulator::flowToLowerNeighbour(const vector<vector<int>> &elevation_mat, vector<vector<double>> &curWater) {
+bool RainfallSimulator::flowToLowerNeighbour(vector<vector<double>> &curWater) {
   int N = elevation_mat.size();
   vector<vector<double>> flowWaterMat(N, vector<double>(N, 0.0));
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       vector<vector<int>> lower_neigh_dir;
-      if (curWater[i][j] > 0 && RainfallSimulator::has_lower_neigh(i, j, elevation_mat, lower_neigh_dir)) {
+      if (curWater[i][j] > 0 && RainfallSimulator::has_lower_neigh(i, j, lower_neigh_dir)) {
 	int neigh_num = lower_neigh_dir.size();
 	double flow_volumn = min(curWater[i][j], 1.0);
 	double water_portion = flow_volumn / (double) neigh_num;
@@ -114,7 +114,7 @@ bool RainfallSimulator::flowToLowerNeighbour(const vector<vector<int>> &elevatio
   return no_flow;
 }
 
-int RainfallSimulator::simulate_seq_helper(const vector<vector<int>> &elevation_mat, vector<vector<double>> &res, int M, double A) {
+int RainfallSimulator::simulate_seq_helper(vector<vector<double>> &res) {
   int time_step = 0;
   int N = elevation_mat.size();
   vector<vector<double>> curWater(N, vector<double>(N, 0.0));
@@ -141,18 +141,33 @@ int RainfallSimulator::simulate_seq_helper(const vector<vector<int>> &elevation_
     }
 
     // flow the remaining water to lower neighbour
-    no_flow = RainfallSimulator::flowToLowerNeighbour(elevation_mat, curWater);
+    no_flow = RainfallSimulator::flowToLowerNeighbour(curWater);
     
     time_step++;
   }
-  int remaining_time_step = RainfallSimulator::endAbsorption(curWater, res, A);
+  int remaining_time_step = RainfallSimulator::endAbsorption(curWater, res);
   time_step += remaining_time_step;
   return time_step;
 }
 
-vector<vector<double>> RainfallSimulator::simulate_seq(const vector<vector<int>> &elevation_mat, int M, double A, int N) {
+
+void RainfallSimulator::setSimulationParameters(const vector<vector<int>> &elevation_mat_in,
+						int M_in, double A_in, int N_in) {
+  for (int i = 0; i < N_in; i++) {
+    vector<int> temp;
+    for (int j = 0; j < N_in; j++) {
+      temp.push_back(elevation_mat_in[i][j]);
+    }
+    elevation_mat.push_back(temp);
+  }
+  M = M_in;
+  A = A_in;
+  N = N_in;
+}
+
+vector<vector<double>> RainfallSimulator::simulate_seq() {
   vector<vector<double>> res(N, vector<double>(N, 0.0));
-  int absorption_cycle = RainfallSimulator::simulate_seq_helper(elevation_mat, res, M, A);
+  int absorption_cycle = RainfallSimulator::simulate_seq_helper(res);
   cout << absorption_cycle << endl;
   printMat(res);
   return res;
